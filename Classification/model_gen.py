@@ -9,6 +9,7 @@ import tensorflow as tf
 
 
 def create_spatial_model(w, h, c, output_nodes):
+    '''Model for the spatial image'''
     # This returns a tensor
     inputs = tf.keras.layers.Input(shape=(w, h, c), name='spatial_img')
 
@@ -44,21 +45,21 @@ def create_freq_model(w, h, c, output_nodes):
 def create_deep_model(w, h, c, output_nodes, n_classes):
     spatial_in = create_spatial_model(w, h, c, output_nodes)
     freq_in = create_freq_model(w, h, c, output_nodes)
-    
+
     inputs = tf.concat([spatial_in.output, freq_in.output], axis=1)
-    
+
     x = tf.keras.layers.Dense(10, activation='relu', name='HL1')(inputs)
     x = tf.keras.layers.Dense(10, activation='relu', name='HL2')(x)
     x = tf.keras.layers.Dense(10, activation='relu', name='HL3')(x)
     x = tf.keras.layers.Dense(10, activation='relu', name='HL4')(x)
     x = tf.keras.layers.Dense(10, activation='relu', name='HL5')(x)
     output = tf.keras.layers.Dense(n_classes, activation='softmax', name='output')(x)
-    
+
     model = tf.keras.models.Model(inputs = [spatial_in.inputs, freq_in.inputs], outputs = output)
     model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
-    
+
     return model
 
 
@@ -71,10 +72,10 @@ def create_model(w, h, c, _, n_classes):
     x = tf.keras.layers.Dense(10, activation='relu', name='HL4')(x)
     x = tf.keras.layers.Dense(10, activation='relu', name='HL5')(x)
     outputs = tf.keras.layers.Dense(n_classes, activation='softmax', name='output')(x)
-    
+
     model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
     model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
-    
+
     return model

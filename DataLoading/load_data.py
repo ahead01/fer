@@ -16,12 +16,17 @@ import model_gen
 
 print("OpenCV Version:", cv2.__version__)
 
-cascade_dir = '/home/austin/Desktop/opencv_workspace/data/'
+DATA_DIR = os.environ['DATA_DIR']
+PROJECT_DIR = os.environ['PROJ_DIR']
+
+cascade_dir = PROJECT_DIR + '/FaceDetection/xml'
+face_cascade_xml = cascade_dir + '/haarcascade_frontalface_default.xml'
+eye_cascade_xml = cascade_dir + '/haarcascade_eye.xml'
 
 label_names = ['neutral', 'anger', 'contempt', 'disgust', 'fear', 'happy', 'sadness', 'surprise']
 
-face_cascade = cv2.CascadeClassifier(cascade_dir + 'haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier(cascade_dir + 'haarcascade_eye.xml')
+face_cascade = cv2.CascadeClassifier(face_cascade_xml)
+eye_cascade = cv2.CascadeClassifier(eye_cascade_xml)
 
 def top_eyes(eyes):
     top_eyes = []
@@ -56,7 +61,7 @@ def top_eyes(eyes):
     return top_eyes
 
 def for_jaffe():
-    img_dir = '/home/austin/Desktop/gPrj/data/jaffe/'
+    img_dir = DATA_DIR + '/jaffe/'
     tiff_pattern = re.compile('\.tiff', re.IGNORECASE)
     hap_ptr = re.compile('HA')
     sad_ptr = re.compile('SA')
@@ -81,19 +86,6 @@ def for_jaffe():
         if tiff_pattern.search(file_name):
             img = cv2.imread(img_dir + file_name, cv2.IMREAD_GRAYSCALE)
             faces = face_cascade.detectMultiScale(img, 1.3, 5)
-            # add this
-            #             #eyes = [tmp[2], tmp[0], tmp[1]]
-                #eyes = [tmp[2], tmp[1], tmp[0]]
-                #eyes = [tmp[1], tmp[2], tmp[0]]
-                #eyes = [tmp[1], tmp[0], tmp[2]]
-                #eyes = [tmp[0], tmp[1], tmp[2]]
-                #eyes = [tmp[0], tmp[2], tmp[1]]
-
-            #watches = watch_cascade.detectMultiScale(gray, 50, 50)
-
-            # add this
-            #for (x,y,w,h) in watches:
-            #    cv2.rectangle(img,(x,y),(x+w,y+h),(255,255,0),2)
 
             for (x,y,w,h) in faces:
                 #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
@@ -112,17 +104,9 @@ def for_jaffe():
                             break
 
                 if try_eyes:
-
                     #roi_gray = img[y:y+h, x:x+w]
                     #roi_color = img[y:y+h, x:x+w]
                     eyes = eye_cascade.detectMultiScale(face_img)
-                    #eyes = [tmp[2], tmp[0], tmp[1]]
-                    #eyes = [tmp[2], tmp[1], tmp[0]]
-                    #eyes = [tmp[1], tmp[2], tmp[0]]
-                    #eyes = [tmp[1], tmp[0], tmp[2]]
-                    #eyes = [tmp[0], tmp[1], tmp[2]]
-                    #eyes = [tmp[0], tmp[2], tmp[1]]
-
 
                     # If more than 2 eyes find the two closest on the y plane
                     if len(eyes) > 2:

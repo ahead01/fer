@@ -16,6 +16,7 @@ Created on Thu Sep 12 17:44:31 2019
 
 import os
 import cv2
+import sys
 #import tensorflow as tf
 import numpy as np
 import scipy.fftpack
@@ -38,10 +39,14 @@ print("OpenCV Version:", cv2.__version__)
 cohn-kanade-images/S005/001/S005_001_00000011.png
 Emotion/S005/001/S005_001_00000011_emotion.txt
 '''
-
-base_dir = '/home/austin/Desktop/gPrj/data/ck/CK+/'
+DATA_DIR = os.environ['DATA_DIR']
+PROJECT_DIR = os.environ['PROJ_DIR']
+base_dir = DATA_DIR + '/ck/CK+/'
 emo_dir = base_dir + 'Emotion_labels/Emotion/'
 img_dir = base_dir + 'extended-cohn-kanade-images/cohn-kanade-images/'
+cascade_dir = PROJECT_DIR + '/FaceDetection/xml'
+face_cascade_xml = cascade_dir + '/haarcascade_frontalface_default.xml'
+eye_cascade_xml = cascade_dir + '/haarcascade_eye.xml'
 
 def load_data():
     data = {}
@@ -68,16 +73,16 @@ def visualize(data):
     words = np.array(list(data.values()))
     print(Counter(words).keys()) # equals to list(set(words))
     print(Counter(words).values()) # counts the elements' frequency
-    
+
     plt.hist(words, bins=np.arange(words.min(), words.max()+1))
 
 
-cascade_dir = '/home/austin/Desktop/opencv_workspace/data/'
+
 
 #label_names = ['neutral', 'anger', 'contempt', 'disgust', 'fear', 'happy', 'sadness', 'surprise']
 
-face_cascade = cv2.CascadeClassifier(cascade_dir + 'haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier(cascade_dir + 'haarcascade_eye.xml')
+face_cascade = cv2.CascadeClassifier(face_cascade_xml)
+eye_cascade = cv2.CascadeClassifier(eye_cascade_xml)
 
 def top_eyes(eyes):
     top_eyes = []
@@ -116,7 +121,7 @@ def create_dataset(data):
     try_eyes = False
     show_img = False
     write_image = True
-    
+
     num_images = len(data) - 1
 
     images = []
@@ -126,16 +131,16 @@ def create_dataset(data):
     file_count = 0
     for file_name, label in data.items():
         img = cv2.imread(file_name, cv2.IMREAD_GRAYSCALE)
-        
+
         faces = face_cascade.detectMultiScale(img, 1.3, 5)
         for (x,y,w,h) in faces:
-            
+
             face_img = img[y:y+h, x:x+w]
             face_img = cv2.GaussianBlur(face_img,(3,3),0)
             face_img = cv2.Laplacian(face_img, cv2.CV_64F)
 
             face_img = cv2.resize(face_img, (128, 128))
-            
+
             if write_image:
                 #freq_img = np.fft.fft2(img)
                 freq_img = scipy.fftpack.dct(face_img)
@@ -206,21 +211,21 @@ if True:
     model = model_gen.create_deep_model(128, 128, 1, 20, len(np.unique(labels)))
     x = images.reshape(len(images), 128, 128, 1).astype('float32') / 255
     xfq = freq_images.reshape(len(images), 128, 128, 1).astype('float32')
-    
+
     y = labels
-    
+
     X_train, X_test, y_train, y_test = train_test_split(x, y, train_size=0.75, shuffle=False)
     Xf_train, Xf_test, y_train, y_test = train_test_split(xfq, y, train_size=0.75, shuffle=False)
-    
+
     #x_test_sp = images.reshape(len(images), 128, 128, 1).astype('float32') / 255
     #x_test_fq = freq_images.reshape(len(images), 128, 128, 1).astype('float32')
     #y_test = labels
-    
+
     history = model.fit([X_train, X_train], y_train,
                         batch_size=20,
                         epochs=200)
                         #,validation_split=0.2)
-    
+
     test_scores = model.evaluate([X_test, X_test], y_test, verbose=0)
     print('Test loss:', test_scores[0])
     print('Test accuracy:', test_scores[1])
