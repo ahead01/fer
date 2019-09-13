@@ -3,16 +3,16 @@ Robust Automatic Facial Expression Recognition
  A collection of scripts for implementation of a system for detecting facial expressions in images.
  
 
-# Data Loading
+# DataLoading
 Files for loading data stored on the disk
 
-# Preprocessing
+# PreProcessing
 Files for processing images. Using mainly opencv and numpy. This includes resizing, rescaling, edge detection and Color to Greyscale.
 
-# Face Detection
+# FaceDetection
 Extracting faces in the image. Mainly Harr Cascade Classifiers
 
-# Feature Extraction
+# FeatureExtraction
 Creating features from the extracted face. Identifying eyes, mouth, frequency domain transormations.
 
 # Classificaiton
