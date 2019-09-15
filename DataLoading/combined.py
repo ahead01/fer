@@ -146,11 +146,11 @@ def load_combined(image_height, image_width, channels):
     jafee_data = load_jaffe(image_height, image_width, channels)
     print(len(ck_data))
     print(len(jafee_data))
-    all_images = np.stach((ck_data[0], jafee_data[0]))
-    all_labels = np.stach((ck_data[1], jafee_data[1]))
-    all_freqim = np.stach((ck_data[2], jafee_data[2]))
     print(ck_data[0].shape)
     print(jafee_data[0].shape)
+    all_images = np.stack((ck_data[0], jafee_data[0]))
+    all_labels = np.stack((ck_data[1], jafee_data[1]))
+    all_freqim = np.stack((ck_data[2], jafee_data[2]))
     print(all_images.shape)
     return
 
