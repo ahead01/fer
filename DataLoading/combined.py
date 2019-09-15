@@ -144,14 +144,24 @@ def load_ck(image_height, image_width, channels):
 def load_combined(image_height, image_width, channels):
     ck_data = load_ck(image_height, image_width, channels)
     jafee_data = load_jaffe(image_height, image_width, channels)
-    print(len(ck_data))
-    print(len(jafee_data))
+    #print(len(ck_data))
+    #print(len(jafee_data))
     print(ck_data[0].shape)
     print(jafee_data[0].shape)
+    print("__")
+    print(ck_data[1].shape)
+    print(jafee_data[1].shape)
+    print("__")
+    print(ck_data[2].shape)
+    print(jafee_data[2].shape)
+    print("__")
     all_images = np.concatenate((ck_data[0], jafee_data[0]), axis=0)
     all_labels = np.concatenate((ck_data[1], jafee_data[1]), axis=0)
     all_freqim = np.concatenate((ck_data[2], jafee_data[2]), axis=0)
     print(all_images.shape)
+    print(all_labels.shape)
+    print(all_freqim.shape)
+    print("__")
     return all_images, all_labels, all_freqim
 
 if __name__ == '__main__':
