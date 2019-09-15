@@ -100,6 +100,12 @@ def load_ck_paths():
             emotion_score = ''
             with open(emotion_file_path, 'r') as f:
                 emotion_score = eval(f.readline())
+                emotion_score = int(emotion_score)
+                if emotion_score == 2:
+                    continue
+                if emotion_score > 2:
+                    emotion_score -= 1
+
             #print('Image:', img_file_name, ', emotion:', emotion_score)
             data[image_file_path] = emotion_score
     return data
@@ -114,11 +120,6 @@ def load_ck(image_height, image_width, channels):
     freq_images = np.zeros((num_images, image_height, image_width, channels))
     file_count = 0
     for file_name, label in data.items():
-        if int(label) == 2:
-            continue
-        if int(label) > 2:
-            label = int(label) - 1
-
         img = cv2.imread(file_name, cv2.IMREAD_GRAYSCALE)
         faces = face_cascade.detectMultiScale(img, 1.3, 5)
         for (x, y, w, h) in faces:
