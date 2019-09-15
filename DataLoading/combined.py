@@ -152,7 +152,7 @@ def load_combined(image_height, image_width, channels):
     all_labels = np.concatenate((ck_data[1], jafee_data[1]), axis=0)
     all_freqim = np.concatenate((ck_data[2], jafee_data[2]), axis=0)
     print(all_images.shape)
-    return
+    return all_images, all_labels, all_freqim
 
 if __name__ == '__main__':
     load_combined(128, 128, 1)
