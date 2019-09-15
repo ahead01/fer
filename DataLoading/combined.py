@@ -21,6 +21,15 @@ from sklearn.preprocessing import MinMaxScaler
 
 print("OpenCV Version:", cv2.__version__)
 
+'''
+ck: 0=neutral, 1=anger, 2=contempt, 3=disgust, 4=fear, 5=happy, 6=sadness, 7=surprise
+JAFEE: 
+
+'''
+ck_label_names = ['neutral', 'anger', 'contempt', 'disgust', 'fear', 'happy', 'sadness', 'surprise']
+
+combined_label_names = ['neutral', 'anger', 'disgust', 'fear', 'happy', 'sadness', 'surprise']
+
 DATA_DIR = os.environ['DATA_DIR']
 PROJECT_DIR = os.environ['PROJ_DIR']
 
@@ -42,6 +51,7 @@ def load_jaffe(image_height, image_width, channels):
     dis_ptr = re.compile('DI')
     fea_ptr = re.compile('FE')
     neu_ptr = re.compile('NE')
+    patterns= [neu_ptr, ang_ptr, dis_ptr, fea_ptr, hap_ptr, sad_ptr, sur_ptr]
     patterns = [hap_ptr, sad_ptr, sur_ptr, ang_ptr, dis_ptr, fea_ptr, neu_ptr]
 
     images = []
@@ -104,6 +114,11 @@ def load_ck(image_height, image_width, channels):
     freq_images = np.zeros((num_images, image_height, image_width, channels))
     file_count = 0
     for file_name, label in data.items():
+        if int(label) == 2:
+            continue
+        if int(label) > 2:
+            label = int(label) - 1
+
         img = cv2.imread(file_name, cv2.IMREAD_GRAYSCALE)
         faces = face_cascade.detectMultiScale(img, 1.3, 5)
         for (x, y, w, h) in faces:
@@ -131,6 +146,12 @@ def load_combined(image_height, image_width, channels):
     jafee_data = load_jaffe(image_height, image_width, channels)
     print(len(ck_data))
     print(len(jafee_data))
+    all_images = np.stach((ck_data[0], jafee_data[0]))
+    all_labels = np.stach((ck_data[1], jafee_data[1]))
+    all_freqim = np.stach((ck_data[2], jafee_data[2]))
+    print(ck_data[0].shape)
+    print(jafee_data[0].shape)
+    print(all_images.shape)
     return
 
 if __name__ == '__main__':
