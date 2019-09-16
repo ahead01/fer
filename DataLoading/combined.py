@@ -23,9 +23,10 @@ print("OpenCV Version:", cv2.__version__)
 
 '''
 ck: 0=neutral, 1=anger, 2=contempt, 3=disgust, 4=fear, 5=happy, 6=sadness, 7=surprise
-JAFEE: 
+JAFEE:
 
 '''
+
 ck_label_names = ['neutral', 'anger', 'contempt', 'disgust', 'fear', 'happy', 'sadness', 'surprise']
 
 combined_label_names = ['neutral', 'anger', 'disgust', 'fear', 'happy', 'sadness', 'surprise']
@@ -41,6 +42,7 @@ eye_cascade = cv2.CascadeClassifier(eye_cascade_xml)
 
 
 def load_jaffe(image_height, image_width, channels):
+    '''load the jafee dataset'''
     img_dir = DATA_DIR + '/jaffe/'
     tiff_pattern = re.compile('\.tiff', re.IGNORECASE)
     jaffe_img_count = 213
@@ -52,7 +54,7 @@ def load_jaffe(image_height, image_width, channels):
     fea_ptr = re.compile('FE')
     neu_ptr = re.compile('NE')
     patterns= [neu_ptr, ang_ptr, dis_ptr, fea_ptr, hap_ptr, sad_ptr, sur_ptr]
-    patterns = [hap_ptr, sad_ptr, sur_ptr, ang_ptr, dis_ptr, fea_ptr, neu_ptr]
+    #patterns = [hap_ptr, sad_ptr, sur_ptr, ang_ptr, dis_ptr, fea_ptr, neu_ptr]
 
     images = []
     labels = []
@@ -73,8 +75,8 @@ def load_jaffe(image_height, image_width, channels):
                         img = np.expand_dims(face_img, axis=2)
                         #freq_img = np.fft.fft2(img)
                         freq_img = scipy.fftpack.dct(img)
-                        images[file_count]=img
-                        freq_images[file_count]=freq_img
+                        images[file_count] = img
+                        freq_images[file_count] = freq_img
                         labels.append(idx)
                         file_count += 1
                         break
