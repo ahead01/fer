@@ -13,6 +13,8 @@ import numpy as np
 import scipy.fftpack
 import re
 import model_gen
+#from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 
 print("OpenCV Version:", cv2.__version__)
 
@@ -144,26 +146,27 @@ def for_jaffe(h, w, c):
     labels = np.array(labels)
     return images, labels, freq_images
 
-HEIGHT, WIDTH, CHANNELS = 128, 128, 1
-images, labels, freq_images = for_jaffe(HEIGHT, WIDTH, CHANNELS)
+if __name__ == '__main__':
+    HEIGHT, WIDTH, CHANNELS = 128, 128, 1
+    images, labels, freq_images = for_jaffe(HEIGHT, WIDTH, CHANNELS)
 
 
-model = model_gen.create_deep_model(HEIGHT, WIDTH, CHANNELS, 50, len(np.unique(labels)))
-x_train_sp = images.reshape(len(images), HEIGHT, WIDTH, CHANNELS).astype('float32') / 255
-x_train_fq = freq_images.reshape(len(images), HEIGHT, WIDTH, CHANNELS)
-y_train = labels
+    model = model_gen.create_wide_model(HEIGHT, WIDTH, CHANNELS, 50, len(np.unique(labels)))
+    x_train_sp = images.reshape(len(images), HEIGHT, WIDTH, CHANNELS).astype('float32') / 255
+    x_train_fq = freq_images.reshape(len(images), HEIGHT, WIDTH, CHANNELS)
+    y_train = labels
 
-x_test_sp = images.reshape(len(images), HEIGHT, WIDTH, CHANNELS).astype('float32') / 255
-x_test_fq = freq_images.reshape(len(images), HEIGHT, WIDTH, CHANNELS)
-y_test = labels
+    x_test_sp = images.reshape(len(images), HEIGHT, WIDTH, CHANNELS).astype('float32') / 255
+    x_test_fq = freq_images.reshape(len(images), HEIGHT, WIDTH, CHANNELS)
+    y_test = labels
 
-history = model.fit([x_train_sp, x_train_fq], y_train,
-                    batch_size=10,
-                    epochs=200,
-                    validation_split=0.2)
+    history = model.fit([x_train_sp, x_train_sp], y_train,
+                        batch_size=10,
+                        epochs=200,
+                        validation_split=0.2)
 
-test_scores = model.evaluate([x_test_sp, x_test_fq], y_test, verbose=0)
-print('Test loss:', test_scores[0])
-print('Test accuracy:', test_scores[1])
+    test_scores = model.evaluate([x_test_sp, x_test_sp], y_test, verbose=0)
+    print('Test loss:', test_scores[0])
+    print('Test accuracy:', test_scores[1])
 
-print(np.unique(labels))
+    print(np.unique(labels))
