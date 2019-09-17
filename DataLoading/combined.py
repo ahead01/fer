@@ -144,7 +144,14 @@ def load_ck(image_height, image_width, channels):
     return [images, labels, freq_images]
 
 
-def load_combined(image_height, image_width, channels):
+def load_data(image_height, image_width, channels, which_set='combined'):
+    if which_set == 'CK':
+        ck_data = load_ck(image_height, image_width, channels)
+        return ck_data
+    if which_set == 'jf':
+        jafee_data = load_jaffe(image_height, image_width, channels)
+        return jafee_data
+    print('Returning combined data')
     ck_data = load_ck(image_height, image_width, channels)
     jafee_data = load_jaffe(image_height, image_width, channels)
     #print(len(ck_data))
@@ -168,5 +175,5 @@ def load_combined(image_height, image_width, channels):
     return all_images, all_labels, all_freqim
 
 if __name__ == '__main__':
-    load_combined(128, 128, 1)
+    load_data(128, 128, 1)
     #TODO: Make sure the class labels are the same
