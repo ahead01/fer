@@ -1,30 +1,32 @@
-import combined
+import jaffe
 import model_gen
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
 HEIGHT, WIDTH, CHANNELS = 128, 128, 1
 
-combined_label_names = ['neutral', 'anger', 'disgust', 'fear', 'happy', 'sadness', 'surprise']
+label_names = ['neutral', 'anger', 'contempt', 'disgust', 'fear', 'happy', 'sadness', 'surprise']
 
+images, labels, freq = jaffe.for_jaffe(HEIGHT, WIDTH, CHANNELS)
 
-images, labels, freq = combined.load_combined(128, 128, 1)
-
-model = model_gen.create_deep_model(HEIGHT, WIDTH, CHANNELS, 20, len(combined_label_names))
+model = model_gen.create_deep_model(HEIGHT, WIDTH, CHANNELS, 20, len(label_names))
 
 x_train_sp = images.reshape(len(images), HEIGHT, WIDTH, CHANNELS).astype('float32') / 255
 x_train_fq = freq.reshape(len(images), HEIGHT, WIDTH, CHANNELS)
 y_train = labels
 
-x_test_sp = images.reshape(len(images), HEIGHT, WIDTH, CHANNELS).astype('float32') / 255
-x_test_fq = freq.reshape(len(images), HEIGHT, WIDTH, CHANNELS)
-y_test = labels
+X_train = x_train_sp
+X_test = x_train_sp
+y_test = y_train
+#X_train, X_test, y_train, y_test = train_test_split(x_train_sp, y_train, train_size=0.75, shuffle=True)
 
-history = model.fit([x_train_sp, x_train_sp], y_train,
+history = model.fit([X_train, x_train_fq], y_train,
                     batch_size=10,
-                    epochs=200,
-                    validation_split=0.2)
+                    epochs=70
+                    ,validation_split=0.2)
 
-test_scores = model.evaluate([x_test_sp, x_test_sp], y_test, verbose=0)
+test_scores = model.evaluate([X_test, x_train_fq], y_test, verbose=0)
 print('Test loss:', test_scores[0])
 print('Test accuracy:', test_scores[1])
 

@@ -13,6 +13,8 @@ import numpy as np
 import scipy.fftpack
 import re
 import model_gen
+#from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 
 print("OpenCV Version:", cv2.__version__)
 
@@ -62,7 +64,8 @@ def top_eyes(eyes):
             continue
     return top_eyes
 
-def for_jaffe():
+def for_jaffe(h, w, c):
+    ''' height, width, channels'''
     img_dir = DATA_DIR + '/jaffe/'
     tiff_pattern = re.compile('\.tiff', re.IGNORECASE)
     hap_ptr = re.compile('HA')
@@ -80,48 +83,42 @@ def for_jaffe():
 
     images = []
     labels = []
-    images = np.zeros((213,128,128,1))
-    freq_images = np.zeros((213,128,128,1))
+    images = np.zeros((213, h, w, c)) # 213 images in dataset
+    freq_images = np.zeros((213, h, w, c))
     file_count = 0
     for file_name in os.listdir(img_dir):
-
         if tiff_pattern.search(file_name):
             img = cv2.imread(img_dir + file_name, cv2.IMREAD_GRAYSCALE)
             faces = face_cascade.detectMultiScale(img, 1.3, 5)
-
-            for (x,y,w,h) in faces:
+            for (fx, fy, fw, fh) in faces:
                 #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-                face_img = img[y:y+h, x:x+w]
-                face_img = cv2.resize(face_img, (128, 128))
+                face_img = img[fy:fy+fh, fx:fx+fw]
+                face_img = cv2.resize(face_img, (h, w))
+                #face_img = cv2.Laplacian(face_img, cv2.CV_64F)
                 if write_image:
                     for idx, pattern in enumerate(patterns):
                         m = pattern.search(file_name)
                         if m:
-                            img = np.expand_dims(face_img, axis=2)
-                            #freq_img = np.fft.fft2(img)
-                            freq_img = scipy.fftpack.dct(img)
-                            images[file_count]=img
-                            freq_images[file_count]=freq_img
+                            freq_img = cv2.Laplacian(face_img, cv2.CV_64F)
+                            face_img = np.expand_dims(face_img, axis=2)
+                            freq_img = np.expand_dims(freq_img, axis=2)
+                            #freq_img = scipy.fftpack.dct(face_img)
+                            images[file_count] = face_img
+                            freq_images[file_count] = freq_img
                             labels.append(idx)
                             break
 
                 if try_eyes:
                     eyes = eye_cascade.detectMultiScale(face_img)
-
-
                     # If more than 2 eyes find the two closest on the y plane
                     if len(eyes) > 2:
                         #eyes = top_eyes(eyes)
                         indxs = []
                         for eye in eyes:
                             indxs.append(eye[1])
-                        print(type(indxs))
-                        print(indxs)
                         val, idx1 = min((val, idx) for (idx, val) in enumerate(indxs))
-                        print(val, idx1)
                         indxs[idx1] = max(indxs)
                         val, idx2 = min((val, idx) for (idx, val) in enumerate(indxs))
-                        print(val, idx2)
                         tmp = [eyes[idx1], eyes[idx2]]
                         if tmp[0][0] > tmp[1][0]:
                             tmp2 = tmp
@@ -129,14 +126,14 @@ def for_jaffe():
                         eyes = tmp
                     if len(eyes) == 2:
                         if eyes[0][0] > eyes[1][0]:
-                                tmp2 = eyes
-                                eyes = [tmp2[1], tmp2[0]]
+                            tmp2 = eyes
+                            eyes = [tmp2[1], tmp2[0]]
 
                     count = 1
-                    for (ex,ey,ew,eh) in eyes:
+                    for (ex, ey, ew, eh) in eyes:
                         eye_img = face_img[ey:ey+eh, ex:ex+ew]
                         #print(eye_img.shape)
-                        cv2.rectangle(face_img,(ex,ey),(ex+ew,ey+eh),(count * 255,255,0),2)
+                        cv2.rectangle(face_img, (ex, ey), (ex+ew, ey+eh), (count * 255, 255, 0), 2)
                         cv2.imshow("cropped", eye_img)
                         cv2.waitKey(0)
                         cv2.destroyAllWindows()
@@ -151,26 +148,27 @@ def for_jaffe():
     labels = np.array(labels)
     return images, labels, freq_images
 
+if __name__ == '__main__':
+    HEIGHT, WIDTH, CHANNELS = 128, 128, 1
+    images, labels, freq_images = for_jaffe(HEIGHT, WIDTH, CHANNELS)
 
-images, labels, freq_images = for_jaffe()
 
+    model = model_gen.create_wide_model(HEIGHT, WIDTH, CHANNELS, 50, len(np.unique(labels)))
+    x_train_sp = images.reshape(len(images), HEIGHT, WIDTH, CHANNELS).astype('float32') / 255
+    x_train_fq = freq_images.reshape(len(images), HEIGHT, WIDTH, CHANNELS)
+    y_train = labels
 
-model = model_gen.create_deep_model(128, 128, 1, 50, len(np.unique(labels)))
-x_train_sp = images.reshape(len(images), 128, 128, 1).astype('float32') / 255
-x_train_fq = freq_images.reshape(len(images), 128, 128, 1)
-y_train = labels
+    x_test_sp = images.reshape(len(images), HEIGHT, WIDTH, CHANNELS).astype('float32') / 255
+    x_test_fq = freq_images.reshape(len(images), HEIGHT, WIDTH, CHANNELS)
+    y_test = labels
 
-x_test_sp = images.reshape(len(images), 128, 128, 1).astype('float32') / 255
-x_test_fq = freq_images.reshape(len(images), 128, 128, 1)
-y_test = labels
+    history = model.fit([x_train_sp, x_train_sp], y_train,
+                        batch_size=10,
+                        epochs=800,
+                        validation_split=0.2)
 
-history = model.fit([x_train_sp, x_train_fq], y_train,
-                    batch_size=10,
-                    epochs=1,
-                    validation_split=0.2)
+    test_scores = model.evaluate([x_test_sp, x_test_sp], y_test, verbose=0)
+    print('Test loss:', test_scores[0])
+    print('Test accuracy:', test_scores[1])
 
-test_scores = model.evaluate([x_test_sp, x_test_fq], y_test, verbose=0)
-print('Test loss:', test_scores[0])
-print('Test accuracy:', test_scores[1])
-
-print(np.unique(labels))
+    print(np.unique(labels))

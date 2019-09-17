@@ -2,6 +2,12 @@
 Robust Automatic Facial Expression Recognition
  A collection of scripts for implementation of a system for detecting facial expressions in images.
  
+Working area for project implementing automatic facial expression recognition.
+
+Datasets are JAFEE and CK+
+
+Work in progress...
+ 
 
 # DataLoading
 Files for loading data stored on the disk

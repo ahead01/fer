@@ -29,10 +29,9 @@ def create_spatial_model(w, h, c, output_nodes):
 
 def create_freq_model(w, h, c, output_nodes):
     inputs = tf.keras.layers.Input(shape=(w, h, c), name='freq_img')
-    x = tf.keras.layers.Conv2D(128, (3,3), padding="same")(inputs)
+    x = tf.keras.layers.Conv2D(128, (3, 3), padding="same")(inputs)
     x = tf.keras.layers.BatchNormalization(axis=-1)(x)
-    x = tf.keras.layers.AveragePooling2D(pool_size=(32,32))(x)
-
+    x = tf.keras.layers.AveragePooling2D(pool_size=(32, 32))(x)
     x = tf.keras.layers.Flatten()(x)
     x = tf.keras.layers.Dense(10, activation='relu', name='freq_HL1')(x)
     x = tf.keras.layers.Dense(10, activation='relu', name='freq_HL2')(x)
@@ -63,14 +62,26 @@ def create_deep_model(w, h, c, output_nodes, n_classes):
     return model
 
 
-def create_model(w, h, c, _, n_classes):
+def create_simple_model(w, h, c, _, n_classes):
     inputs = tf.keras.layers.Input(shape=(w, h, c), name='img')
     x = tf.keras.layers.Flatten()(inputs)
-    x = tf.keras.layers.Dense(10, activation='relu', name='HL1')(x)
-    x = tf.keras.layers.Dense(10, activation='relu', name='HL2')(x)
-    x = tf.keras.layers.Dense(10, activation='relu', name='HL3')(x)
-    x = tf.keras.layers.Dense(10, activation='relu', name='HL4')(x)
+    x = tf.keras.layers.Dense(20, activation='relu', name='HL1')(x)
+    x = tf.keras.layers.Dropout(.01)(x)
+    x = tf.keras.layers.Dense(20, activation='relu', name='HL2')(x)
+    x = tf.keras.layers.Dense(15, activation='relu', name='HL3')(x)
+    x = tf.keras.layers.Dense(20, activation='relu', name='HL4')(x)
+    x = tf.keras.layers.Dropout(.001)(x)
     x = tf.keras.layers.Dense(10, activation='relu', name='HL5')(x)
+    x = tf.keras.layers.Dense(5, activation='relu', name='HL6')(x)
+    x = tf.keras.layers.Dense(5, activation='relu', name='HL7')(x)
+    x = tf.keras.layers.Dense(5, activation='relu', name='HL8')(x)
+    x = tf.keras.layers.Dense(5, activation='relu', name='HL9')(x)
+    x = tf.keras.layers.Dense(5, activation='relu', name='HL10')(x)
+    x = tf.keras.layers.Dense(5, activation='relu', name='HL11')(x)
+    x = tf.keras.layers.Dense(5, activation='relu', name='HL12')(x)
+    x = tf.keras.layers.Dense(5, activation='relu', name='HL13')(x)
+    x = tf.keras.layers.Dense(5, activation='relu', name='HL14')(x)
+    x = tf.keras.layers.Dense(5, activation='relu', name='HL15')(x)
     outputs = tf.keras.layers.Dense(n_classes, activation='softmax', name='output')(x)
 
     model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
@@ -78,4 +89,64 @@ def create_model(w, h, c, _, n_classes):
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
 
+    return model
+
+def create_wide_model(w,h, c, _, n_classes):
+    inputs = tf.keras.layers.Input(shape=(w, h, c), name='img')
+    x = tf.keras.layers.Flatten()(inputs)
+    x = tf.keras.layers.Dense(100, activation='relu', name='HL1')(x)
+    x = tf.keras.layers.Dense(200, activation='relu', name='HL2')(x)
+    x = tf.keras.layers.Dense(300, activation='relu', name='HL3')(x)
+    x = tf.keras.layers.Dense(200, activation='relu', name='HL4')(x)
+    x = tf.keras.layers.Dense(100, activation='relu', name='HL5')(x)
+    outputs = tf.keras.layers.Dense(n_classes, activation='softmax', name='output')(x)
+
+    model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+
+    return model
+
+def create_conv_model(w, h, c, _, n_classes):
+    # This returns a tensor
+    inputs = tf.keras.layers.Input(shape=(w, h, c), name='spatial_img')
+    #x = inputs
+
+    # a layer instance is callable on a tensor, and returns a tensor
+    x = tf.keras.layers.Conv2D(64, (3, 3), padding="same")(inputs)
+    x = tf.keras.layers.Conv2D(64, (3, 3), padding="same")(x)
+
+    if True:
+        x = tf.keras.layers.MaxPooling2D(data_format='channels_last')(x)
+        x = tf.keras.layers.Conv2D(128, (3, 3), padding="same")(x)
+        x = tf.keras.layers.Conv2D(128, (3, 3), padding="same")(x)
+        x = tf.keras.layers.MaxPooling2D(data_format='channels_last')(x)
+        x = tf.keras.layers.Conv2D(256, (3, 3), padding="same")(x)
+        x = tf.keras.layers.Conv2D(256, (3, 3), padding="same")(x)
+        x = tf.keras.layers.Conv2D(256, (3, 3), padding="same")(x)
+        x = tf.keras.layers.Conv2D(256, (3, 3), padding="same")(x)
+        x = tf.keras.layers.MaxPooling2D(data_format='channels_last')(x)
+        x = tf.keras.layers.Conv2D(512, (3, 3), padding="same")(x)
+        x = tf.keras.layers.Conv2D(512, (3, 3), padding="same")(x)
+        x = tf.keras.layers.Conv2D(512, (3, 3), padding="same")(x)
+        x = tf.keras.layers.Conv2D(512, (3, 3), padding="same")(x)
+        x = tf.keras.layers.MaxPooling2D(data_format='channels_last')(x)
+        x = tf.keras.layers.Conv2D(512, (3, 3), padding="same")(x)
+        x = tf.keras.layers.Conv2D(512, (3, 3), padding="same")(x)
+        x = tf.keras.layers.Conv2D(512, (3, 3), padding="same")(x)
+        x = tf.keras.layers.Conv2D(512, (3, 3), padding="same")(x)
+        x = tf.keras.layers.MaxPooling2D(data_format='channels_last')(x)
+        x = tf.keras.layers.Flatten()(x)
+        x = tf.keras.layers.Dense(4096, activation='relu', name='spatial_HL1')(x)
+        x = tf.keras.layers.Dense(4096, activation='relu', name='spatial_HL2')(x)
+        x = tf.keras.layers.Dense(1000, activation='relu', name='spatial_HL3')(x)
+        x = tf.keras.layers.Dense(100, activation='relu', name='spatial_HL4')(x)
+
+    outputs = tf.keras.layers.Dense(n_classes, activation='softmax', name='spatial_output')(x)
+
+    model= tf.keras.models.Model(inputs=inputs, outputs=outputs)
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
     return model
