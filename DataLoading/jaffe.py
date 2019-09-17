@@ -94,13 +94,15 @@ def for_jaffe(h, w, c):
                 #cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
                 face_img = img[fy:fy+fh, fx:fx+fw]
                 face_img = cv2.resize(face_img, (h, w))
+                #face_img = cv2.Laplacian(face_img, cv2.CV_64F)
                 if write_image:
                     for idx, pattern in enumerate(patterns):
                         m = pattern.search(file_name)
                         if m:
+                            freq_img = cv2.Laplacian(face_img, cv2.CV_64F)
                             face_img = np.expand_dims(face_img, axis=2)
-                            #freq_img = np.fft.fft2(img)
-                            freq_img = scipy.fftpack.dct(face_img)
+                            freq_img = np.expand_dims(freq_img, axis=2)
+                            #freq_img = scipy.fftpack.dct(face_img)
                             images[file_count] = face_img
                             freq_images[file_count] = freq_img
                             labels.append(idx)
@@ -162,7 +164,7 @@ if __name__ == '__main__':
 
     history = model.fit([x_train_sp, x_train_sp], y_train,
                         batch_size=10,
-                        epochs=200,
+                        epochs=800,
                         validation_split=0.2)
 
     test_scores = model.evaluate([x_test_sp, x_test_sp], y_test, verbose=0)
