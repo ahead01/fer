@@ -194,7 +194,7 @@ def hap_model(img_height, img_width, n_classes):
     x = tf.keras.layers.Dense(50, activation='relu')(x)
     x = tf.keras.layers.Dense(50, activation='relu')(x)
     x = tf.keras.layers.Dense(50, activation='relu')(x)
-    outputs = tf.keras.layers.Dense(outputs, activation='softmax')(x)
+    outputs = tf.keras.layers.Dense(n_classes, activation='softmax')(x)
     model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
     return model
 
