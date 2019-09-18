@@ -12,7 +12,7 @@ def show_image(img, name='Label'):
 
 def edge_detection(img):
     img = cv2.GaussianBlur(img, (3, 3), cv2.BORDER_DEFAULT)
-    img = cv2.Canny(img, 100, 100)
+    img = cv2.Canny(img, 100, 200)
     return img
 
 def dct_transform(img, blur=False):

@@ -6,14 +6,6 @@ Created on Thu Sep 12 20:58:09 2019
 @author: austin
 """
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Sep 12 17:44:31 2019
-
-@author: austin
-"""
-
 import os
 import cv2
 import sys

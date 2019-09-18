@@ -13,6 +13,7 @@ import numpy as np
 import scipy.fftpack
 import re
 import model_gen
+import pre_processing
 #from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
@@ -64,10 +65,7 @@ def top_eyes(eyes):
             continue
     return top_eyes
 
-def for_jaffe(h, w, c):
-    ''' height, width, channels'''
-    img_dir = DATA_DIR + '/jaffe/'
-    tiff_pattern = re.compile('\.tiff', re.IGNORECASE)
+def get_patterns():
     hap_ptr = re.compile('HA')
     sad_ptr = re.compile('SA')
     sur_ptr = re.compile('SU')
@@ -76,6 +74,13 @@ def for_jaffe(h, w, c):
     fea_ptr = re.compile('FE')
     neu_ptr = re.compile('NE')
     patterns = [hap_ptr, sad_ptr, sur_ptr, ang_ptr, dis_ptr, fea_ptr, neu_ptr]
+    return patterns
+
+def for_jaffe(h, w, c):
+    ''' height, width, channels'''
+    img_dir = DATA_DIR + '/jaffe/'
+    tiff_pattern = re.compile('\.tiff', re.IGNORECASE)
+    patterns = get_patterns()
     try_eyes = False
     show_img = False
     write_image = True
