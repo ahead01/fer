@@ -164,9 +164,9 @@ if __name__ == '__main__':
     if False:
         images, labels, eye_imgs = load_images(img_height, img_width, 1, edge_images=True)
 
-        pre_processing.show_image(images[22], label_names[int(labels[22])])
+        #pre_processing.show_image(images[22], label_names[int(labels[22])])
 
-        pre_processing.show_image(eye_imgs[22], label_names[int(labels[22])])
+        #pre_processing.show_image(eye_imgs[22], label_names[int(labels[22])])
 
         n_classes = len(np.unique(labels))
         print(f'There are {n_classes} classes.')
@@ -211,9 +211,9 @@ if __name__ == '__main__':
     if True:
         images, labels, eye_imgs = load_hap_images(img_height, img_width, 1, edge_images=True)
 
-        pre_processing.show_image(images[22], label_names[int(labels[22])])
+        #pre_processing.show_image(images[22], label_names[int(labels[22])])
 
-        pre_processing.show_image(eye_imgs[22], label_names[int(labels[22])])
+        #pre_processing.show_image(eye_imgs[22], label_names[int(labels[22])])
 
         n_classes = len(np.unique(labels))
         print(f'There are {n_classes} classes.')
