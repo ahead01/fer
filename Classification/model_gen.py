@@ -185,3 +185,21 @@ def face_and_eye_model(img_height, img_width, eye_height, eye_width, n_classes):
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
     return model
+
+
+
+def hap_model(img_height, img_width, n_classes):
+    inputs = tf.keras.layers.Input(shape=(img_height, img_width))
+    x = tf.keras.layers.Flatten()(inputs)
+    x = tf.keras.layers.Dense(50, activation='relu')(x)
+    x = tf.keras.layers.Dense(50, activation='relu')(x)
+    x = tf.keras.layers.Dense(50, activation='relu')(x)
+    outputs = tf.keras.layers.Dense(outputs, activation='softmax')(x)
+    model = tf.keras.models.Model(inputs=inputs, outputs=outputs)
+    return model
+
+def compile_model(model):
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+    return model
