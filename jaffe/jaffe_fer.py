@@ -50,11 +50,11 @@ def select_eyes(eyes):
     if len(eyes) < 2:
         return None
 
-def load_hap_images(img_height, img_width, img_chan, edge_images=False):
+def load_hap_images(img_height, img_width, img_chan, pattern, edge_images=False):
     ''' height, width, channels'''
     img_dir = DATA_DIR + '/jaffe/'
     tiff_pattern = re.compile('\.tiff', re.IGNORECASE)
-    pattern = hap_ptr = re.compile('HA')
+    pattern = hap_ptr = re.compile(pattern)
     # Count files in dir so I can pre allocate np arrays
     image_count = 0
     for file_name in os.listdir(img_dir):
@@ -206,37 +206,47 @@ if __name__ == '__main__':
         test_scores = model.evaluate([images, eye_imgs], labels, verbose=0)
         print('Test loss:', test_scores[0])
         print('Test accuracy:', test_scores[1])
-    
+
     #Only happy images model
-    if True:
-        images, labels, eye_imgs = load_hap_images(img_height, img_width, 1, edge_images=True)
-
-        #pre_processing.show_image(images[22], label_names[int(labels[22])])
-
-        #pre_processing.show_image(eye_imgs[22], label_names[int(labels[22])])
+    if False:
+        images, labels, eye_imgs = load_hap_images(img_height, img_width, 1, 'NE', edge_images=True)
 
         n_classes = len(np.unique(labels))
         print(f'There are {n_classes} classes.')
 
-        model = model_gen.hap_model(img_height, img_width, n_classes)
+        positives = images[labels == 1]
+        negatives = images[labels == 0]
+        p_labels = labels[labels == 1]
+        n_labels = labels[labels == 0]
 
-        model = model_gen.compile_model(model)
+        data = np.concatenate((positives[:30], negatives[:30]), axis=0)
+        labels = np.concatenate((p_labels[:30], n_labels[:30]), axis=0)
 
-        history = model.fit(images, labels,
-                        batch_size=10,
-                        epochs=35
-                        ,validation_split=0.2)
+        x_train, x_test, y_train, y_test = train_test_split(data, labels,  shuffle=True)
 
-        test_scores = model.evaluate(images, labels, verbose=0)
-        print('Test loss:', test_scores[0])
-        print('Test accuracy:', test_scores[1])
+        if True:
+            model = model_gen.hap_model(img_height, img_width, n_classes)
+
+            model = model_gen.compile_model(model)
+
+            history = model.fit(x_train, y_train,
+                            batch_size=1,
+                            epochs=25
+                            ,validation_split=0)
+
+            test_scores = model.evaluate(x_test, y_test, verbose=0)
+            print('Test loss:', test_scores[0])
+            print('Test accuracy:', test_scores[1])
+
+            model_gen.save_trained_model(model, 'jaffe_neu_002')
+            print(y_train, '\\', y_test)
 
 
     # list all data in history
     print(history.history.keys())
     # summarize history for accuracy
     plt.plot(history.history['accuracy'])
-    plt.plot(history.history['val_accuracy'])
+    #plt.plot(history.history['val_accuracy'])
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
@@ -244,7 +254,7 @@ if __name__ == '__main__':
     plt.show()
     # summarize history for loss
     plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
+    #plt.plot(history.history['val_loss'])
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
