@@ -161,8 +161,18 @@ if __name__ == '__main__':
     eye_height = 128
     eye_width = 64
 
-    if False:
+    if True:
         images, labels, eye_imgs = load_images(img_height, img_width, 1, edge_images=True)
+
+        x_train, x_test, y_train, y_test = train_test_split(images, labels,  shuffle=True)
+
+        x_train = x_train[..., tf.newaxis]
+        x_test = x_test[..., tf.newaxis]
+
+        print(x_test.shape)
+
+        train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+        test_dataset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
 
         #pre_processing.show_image(images[22], label_names[int(labels[22])])
 
@@ -241,22 +251,22 @@ if __name__ == '__main__':
             model_gen.save_trained_model(model, 'jaffe_neu_002')
             print(y_train, '\\', y_test)
 
-
-    # list all data in history
-    print(history.history.keys())
-    # summarize history for accuracy
-    plt.plot(history.history['accuracy'])
-    #plt.plot(history.history['val_accuracy'])
-    plt.title('model accuracy')
-    plt.ylabel('accuracy')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
-    # summarize history for loss
-    plt.plot(history.history['loss'])
-    #plt.plot(history.history['val_loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
+    if False:
+        # list all data in history
+        print(history.history.keys())
+        # summarize history for accuracy
+        plt.plot(history.history['accuracy'])
+        #plt.plot(history.history['val_accuracy'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.show()
+        # summarize history for loss
+        plt.plot(history.history['loss'])
+        #plt.plot(history.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.show()
