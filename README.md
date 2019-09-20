@@ -4,6 +4,8 @@ Robust Automatic Facial Expression Recognition
  
 Working area for project implementing automatic facial expression recognition.
 
+Using Tensorflow
+
 Datasets are JAFEE and CK+
 
 Work in progress...
